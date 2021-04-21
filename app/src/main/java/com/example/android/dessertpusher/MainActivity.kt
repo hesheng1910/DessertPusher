@@ -16,8 +16,10 @@
 
 package com.example.android.dessertpusher
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -26,6 +28,7 @@ import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleObserver
 import com.example.android.dessertpusher.databinding.ActivityMainBinding
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -35,13 +38,7 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
     // Contains all the views
     private lateinit var binding: ActivityMainBinding
 
-    /** Dessert Data **/
 
-    /**
-     * Simple data class that represents a dessert. Includes the resource id integer associated with
-     * the image, the price it's sold for, and the startProductionAmount, which determines when
-     * the dessert starts to be produced.
-     */
     data class Dessert(val imageId: Int, val price: Int, val startProductionAmount: Int)
 
     // Create a list of all desserts, in order of when they start being produced
@@ -62,9 +59,10 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
     )
     private var currentDessert = allDesserts[0]
 
+    @SuppressLint("LogNotTimber")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Timber.i("onCreate Called")
         // Use Data Binding to get reference to the views
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
@@ -79,10 +77,6 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         // Make sure the correct dessert is showing
         binding.dessertButton.setImageResource(currentDessert.imageId)
     }
-
-    /**
-     * Updates the score when the dessert is clicked. Possibly shows a new dessert.
-     */
     private fun onDessertClicked() {
 
         // Update the score
@@ -95,20 +89,12 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         // Show the next dessert
         showCurrentDessert()
     }
-
-    /**
-     * Determine which dessert to show.
-     */
     private fun showCurrentDessert() {
         var newDessert = allDesserts[0]
         for (dessert in allDesserts) {
             if (dessertsSold >= dessert.startProductionAmount) {
                 newDessert = dessert
             }
-            // The list of desserts is sorted by startProductionAmount. As you sell more desserts,
-            // you'll start producing more expensive desserts as determined by startProductionAmount
-            // We know to break as soon as we see a dessert who's "startProductionAmount" is greater
-            // than the amount sold.
             else break
         }
 
@@ -119,9 +105,29 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         }
     }
 
-    /**
-     * Menu methods
-     */
+    override fun onPause() {
+        super.onPause()
+        Timber.i("OnPause Called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("OnResume Called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.i("OnStop Called")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.i("OnDestroy Called")
+    }
+    override fun onStart() {
+        super.onStart()
+        Timber.i("OnStart Called")
+    }
+
     private fun onShare() {
         val shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setText(getString(R.string.share_text, dessertsSold, revenue))
